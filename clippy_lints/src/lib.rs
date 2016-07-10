@@ -9,6 +9,7 @@
 #![feature(slice_patterns)]
 #![feature(stmt_expr_attributes)]
 #![feature(type_macros)]
+#![feature(iter_arith)]
 
 #![allow(indexing_slicing, shadow_reuse, unknown_lints)]
 
