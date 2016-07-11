@@ -225,6 +225,7 @@ pub fn register_plugins(reg: &mut rustc_plugin::Registry) {
     reg.register_late_lint_pass(box array_indexing::ArrayIndexing);
     reg.register_late_lint_pass(box panic::Pass);
     reg.register_late_lint_pass(box strings::StringLitAsBytes);
+    reg.register_late_lint_pass(box strings::StringAsStr);
     reg.register_late_lint_pass(box derive::Derive);
     reg.register_late_lint_pass(box types::CharLitAsU8);
     reg.register_late_lint_pass(box print::Pass);
@@ -400,6 +401,7 @@ pub fn register_plugins(reg: &mut rustc_plugin::Registry) {
         returns::LET_AND_RETURN,
         returns::NEEDLESS_RETURN,
         strings::STRING_LIT_AS_BYTES,
+        strings::STRING_AS_STR,
         swap::ALMOST_SWAPPED,
         swap::MANUAL_SWAP,
         temporary_assignment::TEMPORARY_ASSIGNMENT,

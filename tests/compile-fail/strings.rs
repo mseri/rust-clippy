@@ -58,6 +58,22 @@ fn str_lit_as_bytes() {
     let strify = stringify!(foobar).as_bytes();
 }
 
+#[allow(dead_code, unused_variables)]
+#[deny(string_as_str)]
+fn str_as_str() {
+    let bs = String::from("hello there");
+    let slice = &["1".to_string(), "2".to_string(), "3".to_string()];
+
+    let c = bs.as_str().chars().count();
+    //~^ERROR calling `as_str()`
+    //~|HELP `&` syntax
+    //~|SUGGESTION &bs
+
+    // no warning, because this cannot be written as a byte string literal:
+    let _ = slice.iter().any(|v| v.as_str() == "1");
+    let _ = slice.iter().map(|v| v.as_str().to_uppercase());
+}
+
 fn main() {
     add_only();
     add_assign_only();
@@ -70,4 +86,7 @@ fn main() {
     //~| HELP replace
     //~| SUGGESTION ; x += 1;
     assert_eq!(2, x);
+
+    str_lit_as_bytes();
+    str_as_str();
 }

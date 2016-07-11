@@ -63,6 +63,24 @@ declare_lint! {
     "calling `as_bytes` on a string literal; suggests using a byte string literal instead"
 }
 
+/// **What it does:** This lint matches the `as_str` method called on a `String`.
+/// 
+///
+/// **Why is this bad?**  `&` notation can be used instead `&my_string`. This is shorter and less noisy.
+///
+/// **Example:**
+///
+/// ```
+/// let bs = String::from("a string");
+/// ...
+/// do_something(bs.as_str());
+/// ```
+declare_lint! {
+    pub STRING_AS_STR,
+    Warn,
+    "calling `as_str` on a `String`; suggests using `&` notation instead"
+}
+
 #[derive(Copy, Clone)]
 pub struct StringAdd;
 
@@ -154,6 +172,44 @@ impl LateLintPass for StringLitAsBytes {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct StringAsStr;
+
+impl LintPass for StringAsStr {
+    fn get_lints(&self) -> LintArray {
+        lint_array!(STRING_AS_STR)
+    }
+}
+
+impl LateLintPass for StringAsStr {
+    fn check_expr(&mut self, cx: &LateContext, e: &Expr) {
+        use utils::{snippet};
+
+        if let ExprMethodCall(ref name, _, ref args) = e.node {
+            if name.node.as_str() == "as_str" {
+                //if let ExprLit(ref lit) = args[0].node {
+                    //if let LitKind::Str(ref lit_content, _) = lit.node {
+                        // TODO: we need to make sure that we are not in an higher order function...
+                        // this makes no sense: if is_string(cx, lit_content) {
+                            span_lint_and_then(cx,
+                                               STRING_AS_STR,
+                                               e.span,
+                                               "calling `as_str()` on a `String`",
+                                               |db| {
+                                                   let sugg = format!("&{}", snippet(cx, args[0].span, r#""foo""#));
+                                                   db.span_suggestion(e.span,
+                                                                      "consider using `&` syntax instead",
+                                                                      sugg);
+                                               });
+
+                        //}
+                    //}
+                //}
             }
         }
     }
